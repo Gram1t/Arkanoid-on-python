@@ -6,7 +6,7 @@ import pyglet
 WIDTH = 96 * 10
 HEIGHT = 1000
 TITLE = 'Arkanoid'
-POWERUP_PROBABILITY = 0.1  # 10% шанс появи підсилювача
+POWERUP_PROBABILITY = 0.1  # 10% chance of powerup appearance
 LEVEL_FILES = [f'levels/level{i}.txt' for i in range(1, 11)]
 
 
@@ -14,7 +14,7 @@ class PowerUp(arcade.Sprite):
     def __init__(self, texture, scale=1.5):
         super().__init__(f'images/{texture}', scale)
         self.type = texture.split('_')[1].replace('.png', '')  # green, white, red, yellow, size, unsize
-        self.duration = 12  # тривалість дії підсилювача в секундах
+        self.duration = 12  # duration of powerup effect in seconds
 
     def update(self, delta_time=0):
         self.center_y -= 2
@@ -91,7 +91,7 @@ class Paddle(arcade.Sprite):
         self.change_x = 0
         self.speed = 7
         self.original_scale = float(scale)  # ensure original_scale is a float
-        self.scale_factor = float(scale)  # Додаємо scale_factor для зберігання поточного значення масштабування
+        self.scale_factor = float(scale)  # Store current scale factor value
         self.update_hitboxes()
 
     def update_hitboxes(self):
@@ -140,7 +140,7 @@ class AnimatedBackground:
 class Arkanoid(arcade.Window):
     def __init__(self):
         super().__init__(WIDTH, HEIGHT, TITLE)
-        self.level_index = 0  # Індекс поточного рівня
+        self.level_index = 0  # Current level index
         self.balls = arcade.SpriteList()
         self.ball = Ball(start_attached=True)
         self.ball.center_x = WIDTH // 2
@@ -152,7 +152,7 @@ class Arkanoid(arcade.Window):
         self.paddle.bottom = 0
         self.bricks = arcade.SpriteList()
         self.powerups = arcade.SpriteList()
-        self.active_powerups = []  # список активних підсилювачів із їх кінцевим часом дії
+        self.active_powerups = []  # list of active powerups with their end times
         self.background = AnimatedBackground('images/background1.gif')
         self.load_level(self.level_index)
         self.all_sprites = arcade.SpriteList()
@@ -161,12 +161,12 @@ class Arkanoid(arcade.Window):
         self.all_sprites.extend(self.bricks)
         self.all_sprites.extend(self.powerups)
 
-        # Додати фонову музику
+        # Add background music
         self.background_music = pyglet.media.load('music/background.mp3', streaming=False)
         self.background_music_player = pyglet.media.Player()
         self.background_music_player.queue(self.background_music)
         self.background_music_player.loop = True
-        self.background_music_player.volume = 0.35  # Гучність на 35%
+        self.background_music_player.volume = 0.35  # Volume at 35%
         self.background_music_player.play()
 
     def load_level(self, level_index):
@@ -201,7 +201,7 @@ class Arkanoid(arcade.Window):
             self.paddle.bottom = 0
             self.bricks = arcade.SpriteList()
             self.powerups = arcade.SpriteList()
-            self.active_powerups = []  # список активних підсилювачів із їх кінцевим часом дії
+            self.active_powerups = []  # list of active powerups with their end times
             self.load_level(self.level_index)
             self.all_sprites = arcade.SpriteList()
             self.all_sprites.append(self.paddle)
@@ -255,7 +255,7 @@ class Arkanoid(arcade.Window):
         self.clear()
         self.background.draw()
         self.all_sprites.draw()
-        # Відображення номера рівня
+        # Display level number
         arcade.draw_text(f"Level {self.level_index + 1}", WIDTH / 2, HEIGHT - 30,
                          arcade.color.WHITE, font_size=24, anchor_x="center")
 
@@ -268,7 +268,7 @@ class Arkanoid(arcade.Window):
             for ball in self.balls:
                 if ball.stuck:
                     ball.start_moving()
-        if symbol == arcade.key.ENTER:  # Перехід на наступний рівень при натисканні Enter
+        if symbol == arcade.key.ENTER:  # Go to next level when pressing Enter
             self.next_level()
 
     def on_key_release(self, symbol, modifiers):
@@ -307,11 +307,11 @@ class Arkanoid(arcade.Window):
                 ball.speed = max(ball.speed / 1.3, 3.5)
         elif powerup.type == 'size':
             self.paddle.scale_factor = min(float(self.paddle.scale_factor) * 1.5, self.paddle.original_scale * 2)
-            self.paddle.scale = self.paddle.scale_factor  # Застосовуємо фактичне масштабування
+            self.paddle.scale = self.paddle.scale_factor  # Apply actual scaling
         elif powerup.type == 'unsize':
             self.paddle.scale_factor = max(float(self.paddle.scale_factor) / 1.3, self.paddle.original_scale / 1.6)
-            self.paddle.scale = self.paddle.scale_factor  # Застосовуємо фактичне масштабування
-        # Запуск таймера для скасування ефекту підсилювача
+            self.paddle.scale = self.paddle.scale_factor  # Apply actual scaling
+        # Start timer to cancel powerup effect
         if powerup.type in ['red', 'yellow', 'size', 'unsize']:
             self.schedule_timer(powerup.type, end_time)
 
